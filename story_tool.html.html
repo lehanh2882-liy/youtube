@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Present (A1) - Storytelling with Images</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fb;
+            color: #1f2937;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-size: 1.5rem;
+            text-align: center;
+            color: #1e3a8a;
+        }
+
+        .controls {
+            background: #ffffff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1120px;
+            box-sizing: border-box;
+        }
+
+        .status-bar {
+            width: 100%;
+            max-width: 1120px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 0.92rem;
+            box-sizing: border-box;
+        }
+
+        select, input[type="number"], button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        button {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover { background: #1d4ed8; }
+        button.secondary { background: #475569; }
+        button.secondary:hover { background: #334155; }
+        button.active-tab { background: #0f766e; }
+
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            padding: 22px;
+            width: 100%;
+            max-width: 1120px;
+            box-sizing: border-box;
+        }
+
+        .stage {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 18px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .img-box {
+            width: 100%;
+            max-width: 960px;
+            min-height: 440px;
+            aspect-ratio: 16 / 9;
+            margin: 0 auto;
+            background: #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .img-box { min-height: 260px; }
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .img-placeholder {
+            color: #475569;
+            font-size: 1rem;
+            text-align: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .active-caption {
+            text-align: center;
+            padding: 4px 12px;
+        }
+
+        .num-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: #fff;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .active-text {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        .section-heading {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #1e3a8a;
+            margin: 16px 0 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover { background: #eff6ff; }
+
+        .list-item.highlighted {
+            background: #fef9c3;
+            border-color: #eab308;
+            font-weight: 700;
+        }
+
+        .item-num {
+            min-width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dbeafe;
+            color: #1d4ed8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+
+        .thumb {
+            width: 144px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .line-text {
+            font-size: 1.05rem;
+            line-height: 1.45;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>The Present — Storytelling Practice</h1>
+
+    <div class="controls">
+        <button id="v1Btn" type="button" class="active-tab">Version 1: Full Sentences</button>
+        <button id="v2Btn" type="button" class="secondary">Version 2: Keywords</button>
+
+        <label for="voiceSelect">Voice (en-US):</label>
+        <select id="voiceSelect"></select>
+
+        <label for="rateInput">Speed:</label>
+        <input id="rateInput" type="number" value="0.85" step="0.05" min="0.5" max="1.4" style="width: 72px;">
+
+        <button id="testVoiceBtn" type="button" class="secondary">Test Voice</button>
+        <button id="playAllBtn" type="button">Auto Play</button>
+        <button id="stopBtn" type="button" class="secondary">Stop</button>
+    </div>
+
+    <div class="status-bar" id="statusBar">Ready. Click any sentence, "Test Voice", or "Auto Play" to listen.</div>
+
+    <div class="card">
+        <div class="stage">
+            <div class="img-box">
+                <img id="stageImg" src="scene1.jpg" alt="Scene 1">
+                <div id="stageFallback" class="img-placeholder" style="display:none;">
+                    Place <strong>scene<span id="missingNum">1</span>.jpg</strong> in the same folder as this HTML file.
+                </div>
+            </div>
+            <div class="active-caption">
+                <span class="num-badge" id="stageBadge">Sentence 1 / 9</span>
+                <div class="active-text" id="stageText">A boy is playing video games on the sofa in a dark room.</div>
+            </div>
+        </div>
+
+        <div class="section-heading">Story</div>
+        <div id="storyList"></div>
+
+        <div class="section-heading">My feeling</div>
+        <div id="feelingList"></div>
+    </div>
+
+    <script>
+        const items = [
+            { section: "story", img: "scene1.jpg", full: "A boy is playing video games on the sofa in a dark room.", keyword: "PLAYING GAMES IN DARK ROOM" },
+            { section: "story", img: "scene2.jpg", full: "His mom comes home, opens the curtains for sunlight, and gives him a big box.", keyword: "MOM OPENS CURTAINS + BIG BOX" },
+            { section: "story", img: "scene3.jpg", full: "Opening the box, he sees a cute yellow puppy and feels very happy.", keyword: "SEES CUTE YELLOW PUPPY + HAPPY" },
+            { section: "story", img: "scene4.jpg", full: "Then he sees the puppy has only three legs, so he feels sad and pushes it away.", keyword: "THREE LEGS + SAD + PUSHES AWAY" },
+            { section: "story", img: "scene5.jpg", full: "The puppy does not give up, playing happily with a red ball, jumping, falling, and getting up again.", keyword: "NOT GIVE UP + RED BALL + GETS UP" },
+            { section: "story", img: "scene6.jpg", full: "Smiling, the boy throws the ball and stands up with his crutches—he has only one leg, too!", keyword: "THROWS BALL + CRUTCHES + ONE LEG" },
+            { section: "story", img: "scene7.jpg", full: "He opens the door, and they go outside to play in the sun.", keyword: "OPENS DOOR + PLAY IN THE SUN" },
+            { section: "feeling", img: "scene8.jpg", full: "I love this touching story.", keyword: "LOVE TOUCHING STORY" },
+            { section: "feeling", img: "scene9.jpg", full: "The brave, happy puppy teaches me to love myself and enjoy life!", keyword: "BRAVE PUPPY + LOVE MYSELF + ENJOY LIFE" }
+        ];
+
+        let mode = 1;
+        let currentIndex = 0;
+        let isAutoPlaying = false;
+        let voices = [];
+        let playTimer = null;
+
+        const synth = ("speechSynthesis" in window) ? window.speechSynthesis : null;
+        const voiceSelect = document.getElementById("voiceSelect");
+        const rateInput = document.getElementById("rateInput");
+        const statusBar = document.getElementById("statusBar");
+        const storyList = document.getElementById("storyList");
+        const feelingList = document.getElementById("feelingList");
+        const stageImg = document.getElementById("stageImg");
+        const stageFallback = document.getElementById("stageFallback");
+        const missingNum = document.getElementById("missingNum");
+
+        function setStatus(msg) {
+            statusBar.textContent = msg;
+        }
+
+        stageImg.addEventListener("error", () => {
+            stageImg.style.display = "none";
+            stageFallback.style.display = "block";
+        });
+
+        function findEmmaVoice(list) {
+            const exactUsEmma = list.find(v =>
+                (v.name || "").toLowerCase().includes("microsoft") &&
+                (v.name || "").toLowerCase().includes("emma") &&
+                (v.lang || "").toLowerCase().includes("en-us")
+            );
+            if (exactUsEmma) return exactUsEmma;
+
+            const anyEmma = list.find(v => (v.name || "").toLowerCase().includes("emma"));
+            return anyEmma || null;
+        }
+
+        function loadVoices() {
+            if (!synth) {
+                setStatus("Browser does not support speechSynthesis.");
+                return;
+            }
+            const previousSelection = voiceSelect.value;
+            voices = synth.getVoices() || [];
+
+            const usVoices = voices.filter(v => (v.lang || "").toLowerCase().includes("en-us"));
+            const enVoices = voices.filter(v => (v.lang || "").toLowerCase().startsWith("en"));
+            const list = usVoices.length ? usVoices : (enVoices.length ? enVoices : voices);
+
+            voiceSelect.innerHTML = "";
+            if (!list.length) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "System Default (en-US)";
+                voiceSelect.appendChild(opt);
+                setStatus("No voices listed yet. Click Test Voice or Auto Play.");
+                return;
+            }
+
+            list.forEach(v => {
+                const opt = document.createElement("option");
+                opt.value = v.name;
+                opt.textContent = `${v.name} (${v.lang})`;
+                voiceSelect.appendChild(opt);
+            });
+
+            const emmaVoice = findEmmaVoice(list);
+            if (emmaVoice) {
+                voiceSelect.value = emmaVoice.name;
+                setStatus(`Default voice selected: ${emmaVoice.name}`);
+            } else if (previousSelection && list.some(v => v.name === previousSelection)) {
+                voiceSelect.value = previousSelection;
+                setStatus(`Microsoft Emma not found; using: ${previousSelection}`);
+            } else {
+                voiceSelect.selectedIndex = 0;
+                setStatus(`Microsoft Emma not found; using: ${voiceSelect.value}`);
+            }
+        }
+
+        loadVoices();
+        if (synth && typeof synth.onvoiceschanged !== "undefined") {
+            synth.onvoiceschanged = loadVoices;
+        }
+        setTimeout(loadVoices, 300);
+
+        function renderLists() {
+            storyList.innerHTML = "";
+            feelingList.innerHTML = "";
+
+            items.forEach((item, idx) => {
+                const row = document.createElement("div");
+                row.className = "list-item";
+                row.id = `row-${idx}`;
+                const displayLabel = mode === 1 ? item.full : item.keyword;
+
+                const numEl = document.createElement("div");
+                numEl.className = "item-num";
+                numEl.textContent = String(idx + 1);
+
+                const thumbEl = document.createElement("img");
+                thumbEl.className = "thumb";
+                thumbEl.src = item.img;
+                thumbEl.alt = `Scene ${idx + 1}`;
+                thumbEl.addEventListener("error", () => {
+                    thumbEl.style.visibility = "hidden";
+                });
+
+                const textEl = document.createElement("div");
+                textEl.className = "line-text";
+                textEl.textContent = displayLabel;
+
+                row.appendChild(numEl);
+                row.appendChild(thumbEl);
+                row.appendChild(textEl);
+
+                row.addEventListener("click", () => {
+                    isAutoPlaying = false;
+                    clearTimeout(playTimer);
+                    speakAt(idx, false);
+                });
+
+                if (item.section === "story") {
+                    storyList.appendChild(row);
+                } else {
+                    feelingList.appendChild(row);
+                }
+            });
+
+            highlightRow(currentIndex);
+        }
+
+        function highlightRow(idx) {
+            document.querySelectorAll(".list-item").forEach(el => el.classList.remove("highlighted"));
+            const activeRow = document.getElementById(`row-${idx}`);
+            if (activeRow) activeRow.classList.add("highlighted");
+        }
+
+        function updateStage(idx) {
+            currentIndex = idx;
+            const item = items[idx];
+            document.getElementById("stageBadge").textContent = `Sentence ${idx + 1} / ${items.length}`;
+            document.getElementById("stageText").textContent = mode === 1 ? item.full : item.keyword;
+
+            missingNum.textContent = String(idx + 1);
+            stageFallback.style.display = "none";
+            stageImg.style.display = "block";
+            stageImg.src = item.img;
+
+            highlightRow(idx);
+        }
+
+        function speakText(textToSpeak, onDoneCallback, labelPrefix) {
+            if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+                setStatus("Speech synthesis is not available in this browser.");
+                if (onDoneCallback) onDoneCallback();
+                return;
+            }
+
+            try {
+                synth.cancel();
+                if (synth.paused) synth.resume();
+            } catch (e) {}
+
+            if (!voices.length) {
+                loadVoices();
+            }
+
+            const parsedRate = parseFloat(rateInput.value);
+            const safeRate = (!isNaN(parsedRate) && parsedRate >= 0.5 && parsedRate <= 1.5) ? parsedRate : 0.85;
+
+            const chosen = voices.find(v => v.name === voiceSelect.value) || findEmmaVoice(voices) || null;
+
+            const launchUtterance = (useVoice) => {
+                const utter = new SpeechSynthesisUtterance(textToSpeak);
+                if (useVoice) {
+                    utter.voice = useVoice;
+                }
+                utter.lang = "en-US";
+                utter.rate = safeRate;
+
+                let finished = false;
+                const finishOnce = () => {
+                    if (finished) return;
+                    finished = true;
+                    if (onDoneCallback) onDoneCallback();
+                };
+
+                utter.onstart = () => {
+                    const vName = useVoice ? useVoice.name : "System Default (en-US)";
+                    setStatus(`${labelPrefix} | Voice: ${vName} | Speed: ${safeRate}x`);
+                };
+
+                utter.onend = () => {
+                    finishOnce();
+                };
+
+                utter.onerror = (ev) => {
+                    if (useVoice) {
+                        setStatus(`Voice "${useVoice.name}" failed (${ev.error || "error"}), retrying with system default...`);
+                        launchUtterance(null);
+                    } else {
+                        setStatus(`Audio error (${ev.error || "unknown"}). Check speaker/volume or browser permissions.`);
+                        finishOnce();
+                    }
+                };
+
+                try {
+                    synth.speak(utter);
+                } catch (err) {
+                    setStatus(`Speak failed: ${err.message}`);
+                    finishOnce();
+                }
+            };
+
+            launchUtterance(chosen);
+        }
+
+        function speakAt(idx, autoNext) {
+            clearTimeout(playTimer);
+            if (idx >= items.length) {
+                isAutoPlaying = false;
+                setStatus("Finished reading all sentences.");
+                return;
+            }
+            updateStage(idx);
+
+            speakText(
+                items[idx].full,
+                () => {
+                    if (autoNext && isAutoPlaying) {
+                        playTimer = setTimeout(() => speakAt(idx + 1, true), 450);
+                    }
+                },
+                `Sentence ${idx + 1}/${items.length}`
+            );
+        }
+
+        document.getElementById("testVoiceBtn").addEventListener("click", () => {
+            isAutoPlaying = false;
+            clearTimeout(playTimer);
+            speakText("Hello! This is a voice test for The Present story.", null, "Voice Test");
+        });
+
+        document.getElementById("v1Btn").addEventListener("click", () => {
+            mode = 1;
+            document.getElementById("v1Btn").className = "active-tab";
+            document.getElementById("v2Btn").className = "secondary";
+            renderLists();
+            updateStage(currentIndex);
+        });
+
+        document.getElementById("v2Btn").addEventListener("click", () => {
+            mode = 2;
+            document.getElementById("v2Btn").className = "active-tab";
+            document.getElementById("v1Btn").className = "secondary";
+            renderLists();
+            updateStage(currentIndex);
+        });
+
+        document.getElementById("playAllBtn").addEventListener("click", () => {
+            isAutoPlaying = true;
+            speakAt(0, true);
+        });
+
+        document.getElementById("stopBtn").addEventListener("click", () => {
+            isAutoPlaying = false;
+            clearTimeout(playTimer);
+            if (synth) {
+                try { synth.cancel(); } catch (e) {}
+            }
+            setStatus("Stopped.");
+        });
+
+        renderLists();
+        updateStage(0);
+    </script>
+</body>
+</html>
